@@ -7,15 +7,16 @@ XTEST_SUITE(xhttp_server)
 {
 	using namespace xhttp_server;
 
-	void handle_req(request &req, response &rsp)
+	void hello_world(request &req, response &rsp)
 	{
-		req.get_body([&req, &rsp](std::string &&body) {
-
-		});
+		rsp.set_data("hello world");
+		rsp.done();
 	}
 	XUNIT_TEST(regist)
 	{
 		xserver server;
-		server.regist(handle_req);
+		server.bind("0.0.0.0", 9001);
+		server.regist(hello_world);
+		server.run();
 	}
 }

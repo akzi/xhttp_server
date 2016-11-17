@@ -34,11 +34,20 @@ namespace xhttp_server
 		template<typename T>
 		response &set_data(T&& buffer)
 		{
-			buffer_ = std::forward<T>(buffer);
+			data_ = std::forward<T>(buffer);
 			return *this;
 		}
+		void done()
+		{
+			builder_.append_header("Content-Length", std::to_string(data_.size()).c_str());
+			std::string buffer = std::move(builder_.build());
+			buffer.append(data_);
+			send_buffer_(std::move(buffer));
+		}
 	private:
-		std::string buffer_;
+		friend class request;
+		std::function<void(std::string &&)> send_buffer_;
+		std::string data_;
 		xhttper::builder builder_;
 	};
 }

@@ -8,3 +8,4 @@
 #include "../../xhttper/include/parser.hpp"
 #include "../../xlog/include/xlog.hpp"
 #include "../../xjson/include/xjson.hpp"
+#include "../../xutil/include/functional.hpp"

@@ -1,7 +1,7 @@
 #pragma once
 #include "common.hpp"
-#include "request.hpp"
 #include "response.hpp"
+#include "request.hpp"
 namespace xhttp_server
 {
 	class xserver
@@ -38,11 +38,21 @@ namespace xhttp_server
 			auto req = std::make_shared<request>();
 			req->conn_ = std::move(conn);
 			req->init();
-			req->handle_request_ = std::bind(&xserver::handle_request, this, std::ref(*req));
+			req->handle_request_ = std::bind( 
+				&xserver::handle_request, this, std::ref(*req));
+			auto id = gen_id();
+			req->close_callback_ = [id,this]{
+				remove_request(id);
+			};
+			requests_.emplace(id, req);
 		}
 		void handle_request(request &req)
 		{
-
+			request_handler_(req, req.resp);
+		}
+		void remove_request(int64_t id)
+		{
+			requests_.erase(requests_.find(id));
 		}
 		int64_t gen_id()
 		{
