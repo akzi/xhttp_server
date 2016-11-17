@@ -35,8 +35,21 @@ namespace xhttp_server
 	private:
 		void accept_callback(xnet::connection &&conn)
 		{
+			auto req = std::make_shared<request>();
+			req->conn_ = std::move(conn);
+			req->init();
+			req->handle_request_ = std::bind(&xserver::handle_request, this, std::ref(*req));
+		}
+		void handle_request(request &req)
+		{
 
 		}
+		int64_t gen_id()
+		{
+			return ++id_;
+		}
+		int64_t id_ = 0;
+		std::map<int64_t, std::shared_ptr<request>> requests_;
 		request_handler request_handler_;
 		xnet::proactor proactor_;
 		xnet::acceptor acceptor_;

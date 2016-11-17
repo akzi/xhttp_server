@@ -46,9 +46,10 @@ namespace xhttp_server
 				return;
 			}
 			body_ = std::move(parser_.get_string());
-			conn_->async_recv(len);
+			conn_.async_recv(len);
 		}
 	private:
+		friend class xserver;
 		void recv_callback(char *data, int len)
 		{
 			if (len <= 0)
@@ -67,9 +68,9 @@ namespace xhttp_server
 			{
 				parser_.append(data, len);
 				if (parser_.parse_req())
-					handle_request_(*this);
+					handle_request_();
 			}
-			conn_->async_recv_some();
+			conn_.async_recv_some();
 		}
 		void close()
 		{
@@ -79,12 +80,13 @@ namespace xhttp_server
 		{
 
 		}
-		std::function<void(request &)> handle_request_;
+		std::function<void()> handle_request_;
 		std::function<void(std::string &&)> body_callback_;
 		std::string body_;
-		std::shared_ptr<xnet::connection> conn_;
+		xnet::connection conn_;
 		int body_len_ = -1;
 		method method_ = NUll;
 		xhttper::parser parser_;
+		std::list<std::string> send_buffers_;
 	};
 }
