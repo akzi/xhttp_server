@@ -2,6 +2,7 @@
 #include "common.hpp"
 #include "response.hpp"
 #include "request.hpp"
+#include "xsession.hpp"
 namespace xhttp_server
 {
 	class xserver
@@ -9,28 +10,29 @@ namespace xhttp_server
 	public:
 		using request_handler = std::function<void(request &req, response &rsp)>;
 		xserver()
-			:acceptor_(std::move(proactor_.get_acceptor()))
 		{
 		}
-		void bind(const std::string &ip, int port)
+		xserver &bind(const std::string &ip, int port)
 		{
-			acceptor_.bind(ip, port);
-			acceptor_.regist_accept_callback(
+			proactor_pool_.bind(ip, port);
+			proactor_pool_.regist_accept_callback(
 				[this](xnet::connection &&conn) {
 				accept_callback(std::move(conn));
 			});
+			return *this;
 		}
-		void run()
+		void start()
 		{
-			proactor_.run();
+			proactor_pool_.start();
 		}
 		void stop()
 		{
-			proactor_.stop();
+			proactor_pool_.stop();
 		}
-		void regist(request_handler handle)
+		xserver &regist(request_handler handle)
 		{
 			request_handler_ = handle;
+			return *this;
 		}
 	private:
 		void accept_callback(xnet::connection &&conn)
@@ -44,14 +46,20 @@ namespace xhttp_server
 			req->close_callback_ = [id,this]{
 				remove_request(id);
 			};
-			requests_.emplace(id, req);
+			add_request(id, std::move(req));
 		}
 		void handle_request(request &req)
 		{
 			request_handler_(req, req.resp);
 		}
+		void add_request(int64_t id, std::shared_ptr<request> && req)
+		{
+			std::lock_guard<std::mutex> lock(requests_mutex_);
+			requests_.emplace(id, req);
+		}
 		void remove_request(int64_t id)
 		{
+			std::lock_guard<std::mutex> lock(requests_mutex_);
 			requests_.erase(requests_.find(id));
 		}
 		int64_t gen_id()
@@ -59,9 +67,9 @@ namespace xhttp_server
 			return ++id_;
 		}
 		int64_t id_ = 0;
+		std::mutex requests_mutex_;
 		std::map<int64_t, std::shared_ptr<request>> requests_;
 		request_handler request_handler_;
-		xnet::proactor proactor_;
-		xnet::acceptor acceptor_;
+		xnet::proactor_pool proactor_pool_;
 	};
 }
