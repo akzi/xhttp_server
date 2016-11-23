@@ -12,5 +12,14 @@ namespace xhttp_server
 		{
 
 		}
+		void set(const std::string &key, std::string &&value)
+		{
+
+		}
+		void del(const std::string &key)
+		{
+
+		}
+
 	};
 }

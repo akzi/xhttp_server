@@ -17,6 +17,7 @@ XTEST_SUITE(xhttp_server)
 		xserver server;
 		server.bind("0.0.0.0", 9001);
 		server.regist(hello_world);
-		server.run();
+		server.start();
+		getchar();
 	}
 }

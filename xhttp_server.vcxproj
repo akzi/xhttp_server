@@ -114,6 +114,7 @@
     <ClInclude Include="include\request.hpp" />
     <ClInclude Include="include\response.hpp" />
     <ClInclude Include="include\xhttp_server.hpp" />
+    <ClInclude Include="include\xsession.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="unit_test\unit_test.cpp" />
