@@ -1,8 +1,5 @@
 #pragma once
-#include "common.hpp"
-#include "response.hpp"
-#include "request.hpp"
-#include "xsession.hpp"
+#include "detail\detail.hpp"
 namespace xhttp_server
 {
 	class xserver
@@ -40,12 +37,13 @@ namespace xhttp_server
 			auto req = std::make_shared<request>();
 			req->conn_ = std::move(conn);
 			req->init();
-			req->handle_request_ = std::bind( 
-				&xserver::handle_request, this, std::ref(*req));
+			req->handle_request_ = std::bind(&xserver::handle_request, 
+				this, std::ref(*req));
 			auto id = gen_id();
 			req->close_callback_ = [id,this]{
 				remove_request(id);
 			};
+			req->proactor_ = &proactor_pool_.get_current_proactor();
 			add_request(id, std::move(req));
 		}
 		void handle_request(request &req)

@@ -9,6 +9,11 @@ XTEST_SUITE(xhttp_server)
 
 	void hello_world(request &req, response &rsp)
 	{
+		auto session =  req.get_session();
+		xassert(session.set("hello", "world"));
+		std::string result;
+		xassert(session.get("hello",result));
+		xassert(result == "world");
 		rsp.set_data("hello world");
 		rsp.done();
 	}

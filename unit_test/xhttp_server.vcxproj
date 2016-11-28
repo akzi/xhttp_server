@@ -110,7 +110,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\common.hpp" />
+    <ClInclude Include="include\detail\detail.hpp" />
+    <ClInclude Include="include\detail\redis_creater.hpp" />
     <ClInclude Include="include\request.hpp" />
     <ClInclude Include="include\response.hpp" />
     <ClInclude Include="include\xhttp_server.hpp" />

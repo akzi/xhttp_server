@@ -69,8 +69,20 @@ namespace xhttp_server
 			}
 			return !!keepalive_;
 		}
+		xsession get_session()
+		{
+			std::string session_id = parser_.get_header<strncasecmper>("XSEESSIONID");
+			if (session_id.empty())
+				session_id = gen_session_id();
+			assert(proactor_);
+			return xsession(detail::redis_creater::get_instance().get_redis(*proactor_), session_id);
+		}
 	private:
 		friend class xserver;
+		std::string gen_session_id()
+		{
+			return std::to_string(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+		}
 		void recv_callback(char *data, std::size_t len)
 		{
 			if (body_callback_)
@@ -144,5 +156,6 @@ namespace xhttp_server
 		xhttper::parser parser_;
 		std::list<std::string> send_buffers_;
 		response resp;
+		xnet::proactor *proactor_ = nullptr;
 	};
 }
