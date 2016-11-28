@@ -9,6 +9,7 @@
 #include "../../../xlog/include/xlog.hpp"
 #include "../../../xjson/include/xjson.hpp"
 #include "../../../xutil/include/functional.hpp"
+#include "../../../xutil/include/function_traits.hpp"
 #include "../../../xredis/include/hash.hpp"
 #include "../../../xcoroutine/include/xcoroutine.hpp"
 

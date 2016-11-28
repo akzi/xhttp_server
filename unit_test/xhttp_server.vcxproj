@@ -18,6 +18,17 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\detail\detail.hpp" />
+    <ClInclude Include="..\include\detail\redis_creater.hpp" />
+    <ClInclude Include="..\include\request.hpp" />
+    <ClInclude Include="..\include\response.hpp" />
+    <ClInclude Include="..\include\xhttp_server.hpp" />
+    <ClInclude Include="..\include\xsession.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="unit_test.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6E72AC57-FEF2-4EC1-90E3-14BA932424EE}</ProjectGuid>
     <RootNamespace>xhttp_server</RootNamespace>
@@ -109,17 +120,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="include\detail\detail.hpp" />
-    <ClInclude Include="include\detail\redis_creater.hpp" />
-    <ClInclude Include="include\request.hpp" />
-    <ClInclude Include="include\response.hpp" />
-    <ClInclude Include="include\xhttp_server.hpp" />
-    <ClInclude Include="include\xsession.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="unit_test\unit_test.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

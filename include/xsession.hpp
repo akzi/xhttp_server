@@ -13,32 +13,49 @@ namespace xhttp_server
 		bool get(const std::string &key, std::string &value)
 		{
 			bool res = false;
-			xcoroutine::create(xutil::to_function([&] {
-				using xutil::to_function;
-				using xcoroutine::apply;
-				xredis::hash hash(redis_);
-				std::function<void(const std::string &name, std::string &&key, xredis::bulk_callback&& callback)> func = 
-					std::bind(&xredis::hash::hget, std::ref(hash), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-				auto result = apply(to_function(func), session_id_, std::string(key));
-				if (std::get<0>(result).empty())
-					res = true;
-				value = std::get<1>(result);
-			}));
+			using xutil::to_function;
+			using xcoroutine::apply;
+			xredis::hash hash(redis_);
+			std::function<void(const std::string &,
+				std::string &&, 
+				xredis::bulk_callback&&)> func =
+				std::bind(&xredis::hash::hget, 
+					std::ref(hash), 
+					std::placeholders::_1, 
+					std::placeholders::_2, 
+					std::placeholders::_3);
+			auto result = apply(
+				to_function(func), 
+				session_id_, 
+				std::string(key));
+			if (std::get<0>(result).empty())
+				res = true;
+			value = std::get<1>(result);
 			return res;
 		}
 		bool set(const std::string &key, std::string &&value)
 		{
 			bool res = false;
-			xcoroutine::create(xutil::to_function([&] {
-				using xutil::to_function;
-				using xcoroutine::apply;
-				xredis::hash hash(redis_);
-				std::function<void(const std::string &name, std::string &&key, std::string &&value, xredis::integral_callback && callback)> func =
-					std::bind(&xredis::hash::hset, std::ref(hash), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
-				auto result = apply(to_function(func), session_id_, std::string(key), std::move(value));
-				if (std::get<0>(result).empty())
-					res = true;
-			}));
+			using xutil::to_function;
+			using xcoroutine::apply;
+			xredis::hash hash(redis_);
+			std::function<void(const std::string &, 
+				std::string &&, 
+				std::string &&, 
+				xredis::integral_callback&&)> 
+				func = std::bind(&xredis::hash::hset, 
+					std::ref(hash), 
+					std::placeholders::_1, 
+					std::placeholders::_2, 
+					std::placeholders::_3, 
+					std::placeholders::_4);
+			auto result = apply(
+				to_function(func),
+				session_id_, 
+				std::string(key), 
+				std::move(value));
+			if (std::get<0>(result).empty())
+				res = true;
 			return res;
 		}
 		void del(const std::string &key)

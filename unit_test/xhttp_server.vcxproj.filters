@@ -1,23 +1,39 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="unit_test\unit_test.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\request.hpp" />
-    <ClInclude Include="include\response.hpp" />
-    <ClInclude Include="include\xhttp_server.hpp" />
-    <ClInclude Include="include\xsession.hpp" />
-    <ClInclude Include="include\detail\detail.hpp">
-      <Filter>detail</Filter>
-    </ClInclude>
-    <ClInclude Include="include\detail\redis_creater.hpp">
-      <Filter>detail</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="detail">
+    <Filter Include="include">
+      <UniqueIdentifier>{c38eb854-b1f7-4405-a719-8461bfc58647}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\detail">
       <UniqueIdentifier>{79dbbe9b-ba3c-4e7b-9863-557dcaa891c1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{e8f61295-effa-4942-8c25-b04f53e8953b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\detail\redis_creater.hpp">
+      <Filter>include\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\detail\detail.hpp">
+      <Filter>include\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\request.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\response.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xhttp_server.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xsession.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="unit_test.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

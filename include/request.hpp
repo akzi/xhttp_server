@@ -75,13 +75,17 @@ namespace xhttp_server
 			if (session_id.empty())
 				session_id = gen_session_id();
 			assert(proactor_);
-			return xsession(detail::redis_creater::get_instance().get_redis(*proactor_), session_id);
+			return xsession(detail::redis_creater::get_instance().
+				get_redis(*proactor_), session_id);
 		}
 	private:
 		friend class xserver;
 		std::string gen_session_id()
 		{
-			return std::to_string(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+			return std::to_string(
+				std::chrono::high_resolution_clock::now().
+				time_since_epoch().
+				count());
 		}
 		void recv_callback(char *data, std::size_t len)
 		{

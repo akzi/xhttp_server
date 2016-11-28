@@ -18,8 +18,10 @@ namespace xhttp_server
 			});
 			return *this;
 		}
-		void start()
+		void start(std::size_t thread_count = std::thread::hardware_concurrency())
 		{
+			proactor_pool_.set_size(thread_count);
+			proactor_pool_.regist_run_before([this] {	before_run(); });
 			proactor_pool_.start();
 		}
 		void stop()
@@ -31,7 +33,45 @@ namespace xhttp_server
 			request_handler_ = handle;
 			return *this;
 		}
+		xserver &set_redis_addr(const std::string &ip, int port,bool cluster = false)
+		{
+			redis_ip_ = ip;
+			redis_port_ = port;
+			redis_cluster_ = cluster;
+			return *this;
+		}
 	private:
+		void before_run()
+		{
+			auto &redis = detail::redis_creater::get_instance().get_redis(
+				proactor_pool_.get_current_proactor());
+			redis.set_addr(redis_ip_, redis_port_, redis_cluster_);
+			if (redis_cluster_)
+			{
+				redis.regist_cluster_init_callback([](
+					std::string &&error_code, bool status) {
+					if (status)
+					{
+						std::cout << "thread: " 
+							<< std::this_thread::get_id() 
+							<< " redis cluster init ok" 
+							<< std::endl;
+					}
+				});
+			}
+			else {
+				redis.regist_connect_success_callback([] {
+					std::cout << "thread: " 
+						<< std::this_thread::get_id() 
+						<< " redis connect ok" << std::endl;
+				});
+				redis.regist_connect_failed_callback([](const std::string &error_code) {
+					std::cout << "thread: "
+						<< std::this_thread::get_id()
+						<< " redis connect failed: " << error_code << std::endl;
+				});
+			}
+		}
 		void accept_callback(xnet::connection &&conn)
 		{
 			auto req = std::make_shared<request>();
@@ -48,7 +88,9 @@ namespace xhttp_server
 		}
 		void handle_request(request &req)
 		{
-			request_handler_(req, req.resp);
+			xcoroutine::create([&] {
+				request_handler_(req, req.resp);
+			});
 		}
 		void add_request(int64_t id, std::shared_ptr<request> && req)
 		{
@@ -69,5 +111,8 @@ namespace xhttp_server
 		std::map<int64_t, std::shared_ptr<request>> requests_;
 		request_handler request_handler_;
 		xnet::proactor_pool proactor_pool_;
+		std::string redis_ip_;
+		int redis_port_ = 6379;
+		bool redis_cluster_ = false;
 	};
 }
