@@ -30,6 +30,12 @@
     <ClInclude Include="..\include\xsession.hpp">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\file_uploader.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\mime.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="unit_test.cpp">

@@ -78,8 +78,13 @@ namespace xhttp_server
 			return xsession(detail::redis_creater::get_instance().
 				get_redis(*proactor_), session_id);
 		}
+		std::string get_header(const std::string &name)
+		{
+			return parser_.get_header<strncasecmper>(name.c_str());
+		}
 	private:
 		friend class xserver;
+		friend class file_uploader;
 		std::string gen_session_id()
 		{
 			return std::to_string(
