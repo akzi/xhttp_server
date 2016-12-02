@@ -2,6 +2,8 @@
 #include <memory>
 #include <functional>
 #include <string>
+#include <algorithm>
+
 //deps
 #include "../../../xnet/include/proactor_pool.hpp"
 #include "../../../xhttper/include/builder.hpp"

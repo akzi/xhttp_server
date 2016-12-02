@@ -18,7 +18,7 @@ namespace xhttp_server
 		{
 			return method_;
 		}
-		std::size_t body_len()
+		std::size_t content_length()
 		{
 			if (!body_len_)
 			{
@@ -34,22 +34,34 @@ namespace xhttp_server
 			}
 			return body_len_;
 		}
-		void get_body(std::function<void(std::string &&)> &&callback)
+		std::string body()
 		{
-			std::size_t len = static_cast<std::size_t>(body_len());
-			if (len == 0)
+			std::string buffer_ = parser_.get_string();
+			if (buffer_.size() == content_length())
+				return buffer_;
+			else
 			{
-				callback({});
-				return;
+				std::function<void()> resume_handle;
+				conn_.regist_recv_callback([&](char *data, std::size_t len)
+				{
+					if (len == 0) 
+					{
+						conn_.close();
+						resume_handle();
+						return;
+					}
+					buffer_.append(data, len);
+					if (buffer_.size() == content_length())
+					{
+						resume_handle();
+						return;
+					}
+					conn_.async_recv_some();
+				});
+				conn_.async_recv_some();
+				xcoroutine::yield(resume_handle);
 			}
-			auto remain = parser_.remain_len();
-			if (len <= remain)
-			{
-				callback(parser_.get_string(len));
-				return;
-			}
-			body_ = std::move(parser_.get_string());
-			conn_.async_recv(len);
+			return buffer_;
 		}
 		bool keepalive()
 		{
@@ -94,20 +106,11 @@ namespace xhttp_server
 		}
 		void recv_callback(char *data, std::size_t len)
 		{
-			if (body_callback_)
+			parser_.append(data, len);
+			if (parser_.parse_req())
 			{
-				std::size_t remain = body_len_ - body_.size();
-				body_.append(data, remain);
-				data += remain;
-				len -= remain;
-				body_callback_(std::move(body_));
-				body_callback_ = nullptr;
-			}
-			if (len)
-			{
-				parser_.append(data, len);
-				if (parser_.parse_req())
-					handle_request_();
+				handle_request_();
+				return;
 			}
 			conn_.async_recv_some();
 		}
@@ -118,12 +121,14 @@ namespace xhttp_server
 		}
 		void init()
 		{
-			resp.send_buffer_ = [this](std::string &&buffer) {
+			resp.send_buffer_ = [this](std::string &&buffer) 
+			{
 				send_buffers_.emplace_back(std::move(buffer));
 				try_send();
 				parser_.reset();
 			};
-			conn_.regist_send_callback([this](std::size_t len) {
+			conn_.regist_send_callback([this](std::size_t len) 
+			{
 				if (len == 0)
 				{
 					close();
@@ -131,7 +136,8 @@ namespace xhttp_server
 				}
 				try_send();
 			});
-			conn_.regist_recv_callback([this](char *data, std::size_t len){
+			conn_.regist_recv_callback([this](char *data, std::size_t len)
+			{
 				if (len == 0)
 				{
 					close();

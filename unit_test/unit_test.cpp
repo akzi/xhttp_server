@@ -17,12 +17,20 @@ XTEST_SUITE(xhttp_server)
 		rsp.set_data("hello world");
 		rsp.done();
 	}
+
+	void get_body(request &req, response &rsp)
+	{
+		file_uploader uploader(req);
+		uploader.parser_request("");
+		rsp.done();
+	}
+
 	XUNIT_TEST(regist)
 	{
 		xserver server;
 		server.bind("0.0.0.0", 9001);
-		server.set_redis_addr("192.168.0.2",6379);
-		server.regist(hello_world);
+		//server.set_redis_addr("192.168.0.2",6379);
+		server.regist(get_body);
 		server.start();
 		getchar();
 	}

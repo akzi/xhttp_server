@@ -43,6 +43,8 @@ namespace xhttp_server
 	private:
 		void before_run()
 		{
+			if (redis_ip_.empty())
+				return;
 			auto &redis = detail::redis_creater::get_instance().get_redis(
 				proactor_pool_.get_current_proactor());
 			redis.set_addr(redis_ip_, redis_port_, redis_cluster_);
