@@ -53,6 +53,6 @@ namespace xhttp_server
 		}
 		std::function<void(std::string &&)> send_buffer_;
 		std::string data_;
-		xhttper::builder builder_;
+		xhttper::http_builder builder_;
 	};
 }

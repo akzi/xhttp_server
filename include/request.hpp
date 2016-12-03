@@ -117,6 +117,7 @@ namespace xhttp_server
 	private:
 		friend class xserver;
 		friend class uploader;
+		friend class downloader;
 		void reset()
 		{
 			body_.clear();
@@ -204,7 +205,7 @@ namespace xhttp_server
 		std::size_t content_length_ = 0;
 		int keepalive_ = -1;
 		method method_ = NUll;
-		xhttper::parser parser_;
+		xhttper::http_parser parser_;
 		std::list<std::string> send_buffers_;
 		response resp_;
 		xnet::proactor *proactor_ = nullptr;

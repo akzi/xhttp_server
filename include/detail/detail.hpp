@@ -6,8 +6,9 @@
 
 //deps
 #include "../../../xnet/include/proactor_pool.hpp"
-#include "../../../xhttper/include/builder.hpp"
-#include "../../../xhttper/include/parser.hpp"
+#include "../../../xhttper/include/http_builder.hpp"
+#include "../../../xhttper/include/http_parser.hpp"
+#include "../../../xhttper/include/mime_parser.hpp"
 #include "../../../xlog/include/xlog.hpp"
 #include "../../../xjson/include/xjson.hpp"
 #include "../../../xutil/include/functional.hpp"
@@ -19,5 +20,5 @@
 #include "../xsession.hpp"
 #include "../response.hpp"
 #include "../request.hpp"
-#include "../mime_parser.hpp"
 #include "../uploader.hpp"
+#include "../downloader.hpp"

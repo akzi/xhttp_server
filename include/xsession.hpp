@@ -15,21 +15,13 @@ namespace xhttp_server
 			bool res = false;
 			using xutil::to_function;
 			using xcoroutine::apply;
+			using namespace std::placeholders;
 			xredis::hash hash(redis_);
-			std::function<void(const std::string &,
-				std::string &&, 
-				xredis::bulk_callback&&)> func =
-				std::bind(&xredis::hash::hget, 
-					std::ref(hash), 
-					std::placeholders::_1, 
-					std::placeholders::_2, 
-					std::placeholders::_3);
-			auto result = apply(
-				to_function(func), 
-				session_id_, 
-				std::string(key));
+			std::function<void(const std::string &,std::string &&, xredis::bulk_callback&&)> func =
+				std::bind(&xredis::hash::hget, std::ref(hash), _1, _2, _3);
+			auto result = apply(to_function(func), session_id_, std::string(key));
 			if (std::get<0>(result).empty())
-				res = true;
+					res = true;
 			value = std::get<1>(result);
 			return res;
 		}
@@ -38,22 +30,15 @@ namespace xhttp_server
 			bool res = false;
 			using xutil::to_function;
 			using xcoroutine::apply;
+			using namespace std::placeholders;
 			xredis::hash hash(redis_);
 			std::function<void(const std::string &, 
 				std::string &&, 
 				std::string &&, 
 				xredis::integral_callback&&)> 
-				func = std::bind(&xredis::hash::hset, 
-					std::ref(hash), 
-					std::placeholders::_1, 
-					std::placeholders::_2, 
-					std::placeholders::_3, 
+				func = std::bind(&xredis::hash::hset, std::ref(hash), _1, _2, _3, 
 					std::placeholders::_4);
-			auto result = apply(
-				to_function(func),
-				session_id_, 
-				std::string(key), 
-				std::move(value));
+			auto result = apply(to_function(func), session_id_, std::string(key), std::move(value));
 			if (std::get<0>(result).empty())
 				res = true;
 			return res;

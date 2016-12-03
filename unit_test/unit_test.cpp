@@ -7,7 +7,7 @@ XTEST_SUITE(xhttp_server)
 {
 	using namespace xhttp_server;
 
-	void hello_world(request &req, response &rsp)
+	void redis_session_test(request &req, response &rsp)
 	{
 		auto session =  req.get_session();
 		xassert(session.set("hello", "world"));
@@ -31,13 +31,18 @@ XTEST_SUITE(xhttp_server)
 		rsp.done();
 	}
 
+	void download_file_test(request &req, response &rsp)
+	{
+		downloader download_file(req);
+		download_file.send_file("D:/Ñ¸À×ÏÂÔØ/msys2-x86_64-20160205.exe");
+	}
 	XUNIT_TEST(regist)
 	{
 		xserver server;
 		server.bind("0.0.0.0", 9001);
 		//server.set_redis_addr("192.168.0.2",6379);
-		server.regist(upload_file_test);
-		server.start();
+		server.regist(download_file_test);
+		server.start(1);
 		getchar();
 	}
 }

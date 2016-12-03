@@ -33,7 +33,7 @@
     <ClInclude Include="..\include\uploader.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\mime_parser.hpp">
+    <ClInclude Include="..\include\downloader.hpp">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

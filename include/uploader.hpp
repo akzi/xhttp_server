@@ -7,19 +7,17 @@ namespace xhttp_server
 		uploader(request &_request)
 			:request_(_request)
 		{
-			mime_parser_.header_callback_ = 
-				[&] (const std::string &header_name, const std::string &header_value)
+			mime_parser_.regist_header_callback([&] (const std::string &header_name, const std::string &header_value)
 			{
 				mime_header_callback(header_name, header_value);
-			};
-			mime_parser_.data_callback_ = [&](std::string &&data)
+			});
+			mime_parser_.regist_data_callback([&](std::string &&data)
 			{
 				data_callback(std::move(data));
-			};
-			mime_parser_.end_callback_ = [&]() 
-			{
+			});
+			mime_parser_.regist_end_callback([&]{
 				close_file();
-			};
+			});
 		}
 		~uploader()
 		{
@@ -149,7 +147,7 @@ namespace xhttp_server
 		bool is_form_field_ = false;
 		std::string filename_;
 		std::string header_name_;
-		mime_parser mime_parser_;
+		xhttper::mime_parser mime_parser_;
 		std::size_t content_length_ = 0;
 		bool result_ = false;
 		std::string path_;
