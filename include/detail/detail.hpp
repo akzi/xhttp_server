@@ -19,5 +19,5 @@
 #include "../xsession.hpp"
 #include "../response.hpp"
 #include "../request.hpp"
-#include "../file_uploader.hpp"
-#include "../mime.hpp"
+#include "../mime_parser.hpp"
+#include "../uploader.hpp"

@@ -21,8 +21,8 @@
   <ItemGroup>
     <ClInclude Include="..\include\detail\detail.hpp" />
     <ClInclude Include="..\include\detail\redis_creater.hpp" />
-    <ClInclude Include="..\include\file_uploader.hpp" />
-    <ClInclude Include="..\include\mime.hpp" />
+    <ClInclude Include="..\include\uploader.hpp" />
+    <ClInclude Include="..\include\mime_parser.hpp" />
     <ClInclude Include="..\include\request.hpp" />
     <ClInclude Include="..\include\response.hpp" />
     <ClInclude Include="..\include\xhttp_server.hpp" />

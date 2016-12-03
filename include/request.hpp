@@ -20,25 +20,26 @@ namespace xhttp_server
 		}
 		std::size_t content_length()
 		{
-			if (!body_len_)
+			if (!content_length_)
 			{
 				std::string len = parser_.
 					get_header<strncasecmper>("Content-Length");
 
 				if (len.empty())
 				{
-					body_len_ = 0;
-					return body_len_;
+					content_length_ = 0;
+					return content_length_;
 				}
-				body_len_ = std::strtoul(len.c_str(), 0, 10);
+				content_length_ = std::strtoul(len.c_str(), 0, 10);
 			}
-			return body_len_;
+			return content_length_;
 		}
 		std::string body()
 		{
-			std::string buffer_ = parser_.get_string();
-			if (buffer_.size() == content_length())
-				return buffer_;
+			int i = 0;
+			body_ = parser_.get_string();
+			if (body_.size() == content_length())
+				return body_;
 			else
 			{
 				std::function<void()> resume_handle;
@@ -50,8 +51,10 @@ namespace xhttp_server
 						resume_handle();
 						return;
 					}
-					buffer_.append(data, len);
-					if (buffer_.size() == content_length())
+					i++;
+					body_.append(data, len);
+					std::cout << body_ << std::endl;
+					if (body_.size() == content_length())
 					{
 						resume_handle();
 						return;
@@ -60,8 +63,9 @@ namespace xhttp_server
 				});
 				conn_.async_recv_some();
 				xcoroutine::yield(resume_handle);
+				init();
 			}
-			return buffer_;
+			return body_;
 		}
 		bool keepalive()
 		{
@@ -81,6 +85,22 @@ namespace xhttp_server
 			}
 			return !!keepalive_;
 		}
+		std::string get_boundary()
+		{
+			if (boundary_.size())
+				return boundary_;
+			std::string content_type = parser_.get_header<strncasecmper>("Content-Type");
+			if (content_type.empty())
+				return {};
+			if (content_type.find("multipart/form-data") == std::string::npos)
+				return {};
+			auto pos = content_type.find("boundary=");
+			if (pos == std::string::npos)
+				return {};
+			pos += strlen("boundary=");
+			boundary_ = content_type.substr(pos, content_type.size() - pos);
+			return boundary_;
+		}
 		xsession get_session()
 		{
 			std::string session_id = parser_.get_header<strncasecmper>("XSEESSIONID");
@@ -96,7 +116,17 @@ namespace xhttp_server
 		}
 	private:
 		friend class xserver;
-		friend class file_uploader;
+		friend class uploader;
+		void reset()
+		{
+			body_.clear();
+			boundary_.clear();
+			is_close_ = false;
+			is_send_ = false;
+			content_length_ = 0;
+			method_ = NUll;
+			resp_.reset();
+		}
 		std::string gen_session_id()
 		{
 			return std::to_string(
@@ -116,12 +146,14 @@ namespace xhttp_server
 		}
 		void close()
 		{
+			is_close_ = true;
 			conn_.close();
-			close_callback_();
+			if (in_callback_ == false)
+				close_callback_();
 		}
 		void init()
 		{
-			resp.send_buffer_ = [this](std::string &&buffer) 
+			resp_.send_buffer_ = [this](std::string &&buffer) 
 			{
 				send_buffers_.emplace_back(std::move(buffer));
 				try_send();
@@ -149,7 +181,7 @@ namespace xhttp_server
 		}
 		void try_send()
 		{
-			if (is_send_)
+			if (is_send_ || is_close_)
 				return;
 			if (send_buffers_.empty()) 
 			{
@@ -159,18 +191,22 @@ namespace xhttp_server
 			conn_.async_send(std::move(send_buffers_.front()));
 			send_buffers_.pop_front();
 		}
+		std::string boundary_;
+		bool is_close_ = false;
 		bool is_send_ = false;
+		int64_t id_ = 0;
+		bool in_callback_ = false;
 		std::function<void()> close_callback_;
 		std::function<void()> handle_request_;
 		std::function<void(std::string &&)> body_callback_;
 		std::string body_;
 		xnet::connection conn_;
-		std::size_t body_len_ = 0;
+		std::size_t content_length_ = 0;
 		int keepalive_ = -1;
 		method method_ = NUll;
 		xhttper::parser parser_;
 		std::list<std::string> send_buffers_;
-		response resp;
+		response resp_;
 		xnet::proactor *proactor_ = nullptr;
 	};
 }

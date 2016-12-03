@@ -82,16 +82,23 @@ namespace xhttp_server
 			req->handle_request_ = std::bind(&xserver::handle_request, 
 				this, std::ref(*req));
 			auto id = gen_id();
-			req->close_callback_ = [id,this]{
+			req->id_ = id;
+			req->close_callback_ = [&,id] {
 				remove_request(id);
 			};
 			req->proactor_ = &proactor_pool_.get_current_proactor();
-			add_request(id, std::move(req));
+			add_request(req->id_, std::move(req));
 		}
 		void handle_request(request &req)
 		{
 			xcoroutine::create([&] {
-				request_handler_(req, req.resp);
+				req.reset();
+				req.in_callback_ = true;
+				request_handler_(req, req.resp_);
+				req.in_callback_ = false;
+				req.parser_.reset();
+				if (req.is_close_)
+					remove_request(req.id_);
 			});
 		}
 		void add_request(int64_t id, std::shared_ptr<request> && req)

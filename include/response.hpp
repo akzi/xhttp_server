@@ -46,6 +46,11 @@ namespace xhttp_server
 		}
 	private:
 		friend class request;
+		void reset()
+		{
+			data_.clear();
+			builder_.reset();
+		}
 		std::function<void(std::string &&)> send_buffer_;
 		std::string data_;
 		xhttper::builder builder_;

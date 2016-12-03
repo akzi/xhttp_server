@@ -18,10 +18,16 @@ XTEST_SUITE(xhttp_server)
 		rsp.done();
 	}
 
-	void get_body(request &req, response &rsp)
+	void upload_file_test(request &req, response &rsp)
 	{
-		file_uploader uploader(req);
-		uploader.parser_request("");
+		uploader _uploader(req);
+		_uploader.parser_request("");
+		std::cout << std::endl;
+		for(auto &itr: _uploader.get_field())
+			std::cout << itr.first << ": " << itr.second << std::endl;
+		for (auto &itr : _uploader.get_files())
+			std::cout << itr.first << ": " << itr.second << std::endl;
+		rsp.set_data("ok");
 		rsp.done();
 	}
 
@@ -30,8 +36,9 @@ XTEST_SUITE(xhttp_server)
 		xserver server;
 		server.bind("0.0.0.0", 9001);
 		//server.set_redis_addr("192.168.0.2",6379);
-		server.regist(get_body);
+		server.regist(upload_file_test);
 		server.start();
 		getchar();
 	}
 }
+ 
