@@ -92,13 +92,21 @@ namespace xhttp_server
 		void handle_request(request &req)
 		{
 			xcoroutine::create([&] {
-				req.reset();
 				req.in_callback_ = true;
 				request_handler_(req, req.resp_);
 				req.in_callback_ = false;
-				req.parser_.reset();
 				if (req.is_close_)
 					remove_request(req.id_);
+				else if (req.keepalive())
+				{
+					req.conn_.async_recv_some();
+					req.reset();
+				}
+				else if(req.send_buffers_.empty())
+				{
+					remove_request(req.id_);
+				}
+				//todo close connection
 			});
 		}
 		void add_request(int64_t id, std::shared_ptr<request> && req)

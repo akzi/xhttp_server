@@ -36,9 +36,9 @@ namespace xhttp_server
 				return false;
 			file_.seekg(0, std::ios::end);
 			auto size = file_.tellg();
-			http_builder_.append_header("Content-Length", std::to_string(size).c_str());
-			http_builder_.append_header("Content-Type", get_content_type(get_extension(filepath_)).c_str());
-			http_builder_.append_header("Content-Disposition", ("attachment; filename=" + get_filename(filepath_)).c_str());
+			http_builder_.append_entry("Content-Length", std::to_string(size).c_str());
+			http_builder_.append_entry("Content-Type", get_content_type(get_extension(filepath_)).c_str());
+			http_builder_.append_entry("Content-Disposition", ("attachment; filename=" + get_filename(filepath_)).c_str());
 			std::string buffer;
 			buffer.resize(1024);
 			std::function<void()> resume_handle;
@@ -59,7 +59,7 @@ namespace xhttp_server
 				file_.read((char*)buffer.data(), buffer.size());
 				conn.async_send(buffer.data(), (int)file_.gcount());
 			});
-			conn.async_send(std::move(http_builder_.build()));
+			conn.async_send(std::move(http_builder_.build_resp()));
 			xcoroutine::yield(resume_handle);
 			request_.init();
 			return  true;

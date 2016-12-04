@@ -20,7 +20,7 @@ namespace xhttp_server
 		}
 		std::size_t content_length()
 		{
-			if (!content_length_)
+			if (content_length_ == (std::size_t)-1)
 			{
 				std::string len = parser_.
 					get_header<strncasecmper>("Content-Length");
@@ -71,14 +71,13 @@ namespace xhttp_server
 		{
 			if (keepalive_ == -1)
 			{
-				std::string conn = parser_.
-					get_header<strncasecmper>("Connection");
-				if (conn.empty())
+				std::string buffer = parser_.get_header<strncasecmper>("Connection");
+				if (buffer.empty())
 				{
 					keepalive_ = 0;
 					return false;
 				}
-				if (strcasecmper()(conn.c_str(), "Keep-Alive"))
+				if (strncasecmper()(buffer.c_str(), "keep-alive", buffer.size()))
 				{
 					keepalive_ = 1;
 				}
@@ -123,10 +122,11 @@ namespace xhttp_server
 			body_.clear();
 			boundary_.clear();
 			is_close_ = false;
-			is_send_ = false;
-			content_length_ = 0;
+			content_length_ = (std::size_t)-1;
+			keepalive_ = -1;
 			method_ = NUll;
 			resp_.reset();
+			parser_.reset();
 		}
 		std::string gen_session_id()
 		{
@@ -158,7 +158,6 @@ namespace xhttp_server
 			{
 				send_buffers_.emplace_back(std::move(buffer));
 				try_send();
-				parser_.reset();
 			};
 			conn_.regist_send_callback([this](std::size_t len) 
 			{
@@ -187,6 +186,8 @@ namespace xhttp_server
 			if (send_buffers_.empty()) 
 			{
 				is_send_ = false;
+				if (!keepalive())
+					close();
 				return;
 			}
 			conn_.async_send(std::move(send_buffers_.front()));
@@ -202,7 +203,7 @@ namespace xhttp_server
 		std::function<void(std::string &&)> body_callback_;
 		std::string body_;
 		xnet::connection conn_;
-		std::size_t content_length_ = 0;
+		std::size_t content_length_ = (std::size_t)-1;
 		int keepalive_ = -1;
 		method method_ = NUll;
 		xhttper::http_parser parser_;

@@ -26,9 +26,9 @@ namespace xhttp_server
 			builder_.set_status(status);
 			return *this;
 		}
-		response &add_header(const std::string &keyname, const std::string &value)
+		response &add_entry(const std::string &keyname, const std::string &value)
 		{
-			builder_.append_header(keyname, value);
+			builder_.append_entry(keyname, value);
 			return *this;
 		}
 		template<typename T>
@@ -37,10 +37,24 @@ namespace xhttp_server
 			data_ = std::forward<T>(buffer);
 			return *this;
 		}
+		bool set_file(const std::string &filepath)
+		{
+			std::ifstream file(filepath, std::ifstream::binary);
+			if (!file)
+				return false;
+			std::string buffer((std::istreambuf_iterator<char>(file)),
+				std::istreambuf_iterator<char>());
+			data_ = std::move(buffer);
+			file.close();
+			if(filepath.find_last_of(".html") != std::string::npos ||
+				filepath.find_last_of(".htm") != std::string::npos)
+				add_entry("Content-type", "text/html");
+			return true;
+		}
 		void done()
 		{
-			builder_.append_header("Content-Length", std::to_string(data_.size()).c_str());
-			std::string buffer = std::move(builder_.build());
+			builder_.append_entry("Content-Length", std::to_string(data_.size()).c_str());
+			std::string buffer = std::move(builder_.build_resp());
 			buffer.append(data_);
 			send_buffer_(std::move(buffer));
 		}
