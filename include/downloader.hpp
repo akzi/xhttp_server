@@ -61,7 +61,7 @@ namespace xhttp_server
 			});
 			conn.async_send(std::move(http_builder_.build_resp()));
 			xcoroutine::yield(resume_handle);
-			request_.init();
+			request_.do_receive();
 			return  true;
 		}
 		struct cmper 

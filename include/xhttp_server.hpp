@@ -78,7 +78,6 @@ namespace xhttp_server
 		{
 			auto req = std::make_shared<request>();
 			req->conn_ = std::move(conn);
-			req->init();
 			req->handle_request_ = std::bind(&xserver::handle_request, 
 				this, std::ref(*req));
 			auto id = gen_id();
@@ -87,7 +86,8 @@ namespace xhttp_server
 				remove_request(id);
 			};
 			req->proactor_ = &proactor_pool_.get_current_proactor();
-			add_request(req->id_, std::move(req));
+			add_request(req->id_, req);
+			req->do_receive();
 		}
 		void handle_request(request &req)
 		{
@@ -109,7 +109,7 @@ namespace xhttp_server
 				//todo close connection
 			});
 		}
-		void add_request(int64_t id, std::shared_ptr<request> && req)
+		void add_request(int64_t id, std::shared_ptr<request> & req)
 		{
 			std::lock_guard<std::mutex> lock(requests_mutex_);
 			requests_.emplace(id, req);

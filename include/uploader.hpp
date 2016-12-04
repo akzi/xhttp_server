@@ -21,7 +21,7 @@ namespace xhttp_server
 		}
 		~uploader()
 		{
-			request_.init();
+			request_.do_receive();
 		}
 		bool parser_request(const std::string &path = "")
 		{

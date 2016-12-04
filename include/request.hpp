@@ -63,7 +63,7 @@ namespace xhttp_server
 				});
 				conn_.async_recv_some();
 				xcoroutine::yield(resume_handle);
-				init();
+				do_receive();
 			}
 			return body_;
 		}
@@ -152,7 +152,7 @@ namespace xhttp_server
 			if (in_callback_ == false)
 				close_callback_();
 		}
-		void init()
+		void do_receive()
 		{
 			resp_.send_buffer_ = [this](std::string &&buffer) 
 			{
