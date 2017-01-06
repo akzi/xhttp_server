@@ -6,7 +6,9 @@ namespace xhttp_server
 	{
 	public:
 		using request_handler = std::function<void(request &req, response &rsp)>;
-		xserver()
+
+		xserver(std::size_t thread_count = std::thread::hardware_concurrency())
+			:proactor_pool_(thread_count)
 		{
 		}
 		xserver &bind(const std::string &ip, int port)
@@ -18,9 +20,8 @@ namespace xhttp_server
 			});
 			return *this;
 		}
-		void start(std::size_t thread_count = std::thread::hardware_concurrency())
+		void start()
 		{
-			proactor_pool_.set_size(thread_count);
 			proactor_pool_.regist_run_before([this] {	before_run(); });
 			proactor_pool_.start();
 		}

@@ -34,15 +34,20 @@ XTEST_SUITE(xhttp_server)
 	void download_file_test(request &req, response &rsp)
 	{
 		downloader download_file(req);
-		download_file.send_file("D:/Ñ¸À×ÏÂÔØ/msys2-x86_64-20160205.exe");
+		download_file.send_file("index.html");
+	}
+	void index(request &req, response &rsp)
+	{
+		rsp.set_file("index.html");
+		rsp.done();
 	}
 	XUNIT_TEST(regist)
 	{
 		xserver server;
 		server.bind("0.0.0.0", 9001);
 		//server.set_redis_addr("192.168.0.2",6379);
-		server.regist(download_file_test);
-		server.start(1);
+		server.regist(index);
+		server.start();
 		getchar();
 	}
 }
