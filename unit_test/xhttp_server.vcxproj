@@ -22,6 +22,7 @@
     <ClInclude Include="..\include\detail\detail.hpp" />
     <ClInclude Include="..\include\detail\redis_creater.hpp" />
     <ClInclude Include="..\include\downloader.hpp" />
+    <ClInclude Include="..\include\filelist.hpp" />
     <ClInclude Include="..\include\uploader.hpp" />
     <ClInclude Include="..\include\request.hpp" />
     <ClInclude Include="..\include\response.hpp" />

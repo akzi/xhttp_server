@@ -38,15 +38,30 @@ XTEST_SUITE(xhttp_server)
 	}
 	void index(request &req, response &rsp)
 	{
-		rsp.set_file("index.html");
+		rsp.send_file("index.html");
 		rsp.done();
+	}
+	void filelist_test(request &req, response &resp)
+	{
+		auto path = req.req_path();
+		if (path.back() == '/' || path.back() == '\\')
+		{
+			filelist fl(resp);
+			return fl.resp_file_list(path);
+		}
+		downloader download_file(req);
+		if (!download_file.send_file(xutil::vfs::getcwd()() +  path))
+		{
+			resp.set_status(404);
+			resp.done();
+		}
 	}
 	XUNIT_TEST(regist)
 	{
 		xserver server;
 		server.bind("0.0.0.0", 9001);
 		//server.set_redis_addr("192.168.0.2",6379);
-		server.regist(index);
+		server.regist(filelist_test);
 		server.start();
 		getchar();
 	}

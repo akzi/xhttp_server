@@ -36,6 +36,9 @@
     <ClInclude Include="..\include\downloader.hpp">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\filelist.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="unit_test.cpp">
