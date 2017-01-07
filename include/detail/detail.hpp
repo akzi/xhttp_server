@@ -13,6 +13,7 @@
 #include "../../../xjson/include/xjson.hpp"
 #include "../../../xutil/include/functional.hpp"
 #include "../../../xutil/include/function_traits.hpp"
+#include "../../../xutil/include/vfs.hpp"
 #include "../../../xredis/include/hash.hpp"
 #include "../../../xcoroutine/include/xcoroutine.hpp"
 
@@ -22,3 +23,4 @@
 #include "../request.hpp"
 #include "../uploader.hpp"
 #include "../downloader.hpp"
+#include "../filelist.hpp"

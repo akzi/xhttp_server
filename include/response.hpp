@@ -24,6 +24,10 @@ namespace xhttp_server
 		response &set_status(int status)
 		{
 			builder_.set_status(status);
+			if (status == 404)
+			{
+				data_ = "<html><body><h1>404</1h></body></html>";
+			}
 			return *this;
 		}
 		response &add_entry(const std::string &keyname, const std::string &value)
@@ -37,8 +41,10 @@ namespace xhttp_server
 			data_ = std::forward<T>(buffer);
 			return *this;
 		}
-		bool set_file(const std::string &filepath)
+		bool send_file(const std::string &filepath)
 		{
+			using get_extension = xutil::functional::get_extension;
+
 			std::ifstream file(filepath, std::ifstream::binary);
 			if (!file)
 				return false;
@@ -46,15 +52,14 @@ namespace xhttp_server
 				std::istreambuf_iterator<char>());
 			data_ = std::move(buffer);
 			file.close();
-			if(filepath.find_last_of(".html") != std::string::npos ||
-				filepath.find_last_of(".htm") != std::string::npos)
-				add_entry("Content-type", "text/html");
+			builder_.append_entry("Content-Type", builder_.get_content_type(get_extension()(filepath)));
 			return true;
 		}
 		void done()
 		{
-			builder_.append_entry("Content-Length", std::to_string(data_.size()).c_str());
-			std::string buffer = std::move(builder_.build_resp());
+			if(data_.size())
+				builder_.append_entry("Content-Length", std::to_string(data_.size()));
+			std::string buffer = builder_.build_resp();
 			buffer.append(data_);
 			send_buffer_(std::move(buffer));
 		}

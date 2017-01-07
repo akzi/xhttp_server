@@ -100,8 +100,8 @@ namespace xhttp_server
 					remove_request(req.id_);
 				else if (req.keepalive())
 				{
-					req.conn_.async_recv_some();
 					req.reset();
+					req.do_receive();
 				}
 				else if(req.send_buffers_.empty())
 				{

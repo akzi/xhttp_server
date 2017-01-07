@@ -113,6 +113,10 @@ namespace xhttp_server
 		{
 			return parser_.get_header<strncasecmper>(name.c_str());
 		}
+		std::string req_path()
+		{
+			return parser_.get_path();
+		}
 	private:
 		friend class xserver;
 		friend class uploader;
