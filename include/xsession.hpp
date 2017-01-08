@@ -36,8 +36,7 @@ namespace xhttp_server
 				std::string &&, 
 				std::string &&, 
 				xredis::integral_callback&&)> 
-				func = std::bind(&xredis::hash::hset, std::ref(hash), _1, _2, _3, 
-					std::placeholders::_4);
+				func = std::bind(&xredis::hash::hset, std::ref(hash), _1, _2, _3, _4);
 			auto result = apply(to_function(func), session_id_, std::string(key), std::move(value));
 			if (std::get<0>(result).empty())
 				res = true;

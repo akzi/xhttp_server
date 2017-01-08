@@ -7,31 +7,21 @@ namespace xhttp_server
 		uploader(request &_request)
 			:request_(_request)
 		{
-			mime_parser_.regist_header_callback([&] (const std::string &header_name, const std::string &header_value)
-			{
-				mime_header_callback(header_name, header_value);
-			});
-			mime_parser_.regist_data_callback([&](std::string &&data)
-			{
-				data_callback(std::move(data));
-			});
-			mime_parser_.regist_end_callback([&]{
-				close_file();
-			});
+			init();
 		}
 		~uploader()
 		{
 			request_.do_receive();
 		}
-		bool parser_request(const std::string &path = "")
+		bool parse_request(const std::string &path = "")
 		{
 			path_ = path;
 			content_length_ = request_.content_length();
 			if (!content_length_)
 				return false;
-			if (!check_content_type())
+			if (!check_boundary())
 				return  false;
-			return do_parser();
+			return do_parse();
 		}
 		std::map<std::string, std::string> get_field()
 		{
@@ -42,7 +32,21 @@ namespace xhttp_server
 			return files_;
 		}
 	private:
-		bool check_content_type()
+		void init()
+		{
+			mime_parser_.regist_header_callback([&](const std::string &header_name, const std::string &header_value)
+			{
+				mime_header_callback(header_name, header_value);
+			});
+			mime_parser_.regist_data_callback([&](std::string &&data)
+			{
+				data_callback(std::move(data));
+			});
+			mime_parser_.regist_end_callback([&] {
+				close_file();
+			});
+		}
+		bool check_boundary()
 		{
 			auto boundary = request_.get_boundary();
 			if (boundary.empty())
@@ -50,12 +54,12 @@ namespace xhttp_server
 			mime_parser_.set_boundary(boundary);
 			return true;
 		}
-		bool do_parser()
+		bool do_parse()
 		{
 			auto buffer = request_.parser_.get_string();
 			char *ptr = (char*)buffer.data();
 			std::size_t length = buffer.length();
-			if (mime_parser_.do_parser(ptr, length))
+			if (mime_parser_.do_parse(ptr, length))
 				return true;
 			std::function<void()> resume_handle;
 			xnet::connection &conn = request_.conn_;
@@ -67,7 +71,7 @@ namespace xhttp_server
 					request_.close();
 					resume_handle();
 				}
-				if (mime_parser_.do_parser(data, len))
+				if (mime_parser_.do_parse(data, len))
 				{
 					resume_handle();
 					return;
@@ -82,7 +86,7 @@ namespace xhttp_server
 		{
 			close_file();
 			if (name == "Content-Disposition")
-			{//name="name3"
+			{
 				auto beg = value.find("name=\"");
 				if (beg == std::string::npos)
 					return;
