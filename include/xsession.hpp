@@ -16,9 +16,9 @@ namespace xhttp_server
 			using xutil::to_function;
 			using xcoroutine::apply;
 			using namespace std::placeholders;
-			xredis::hash hash(redis_);
-			std::function<void(const std::string &,std::string &&, xredis::bulk_callback&&)> func =
-				std::bind(&xredis::hash::hget, std::ref(hash), _1, _2, _3);
+			xredis::cmd::hash hash(redis_);
+			std::function<void(const std::string &,std::string &&, xredis::string_callback&&)> func =
+				std::bind(&xredis::cmd::hash::hget<std::string>, std::ref(hash), _1, _2, _3);
 			auto result = apply(to_function(func), session_id_, std::string(key));
 			if (std::get<0>(result).empty())
 					res = true;
@@ -31,12 +31,12 @@ namespace xhttp_server
 			using xutil::to_function;
 			using xcoroutine::apply;
 			using namespace std::placeholders;
-			xredis::hash hash(redis_);
+			xredis::cmd::hash hash(redis_);
 			std::function<void(const std::string &, 
 				std::string &&, 
 				std::string &&, 
 				xredis::integral_callback&&)> 
-				func = std::bind(&xredis::hash::hset, std::ref(hash), _1, _2, _3, _4);
+				func = std::bind(&xredis::cmd::hash::hset<std::string>, std::ref(hash), _1, _2, _3, _4);
 			auto result = apply(to_function(func), session_id_, std::string(key), std::move(value));
 			if (std::get<0>(result).empty())
 				res = true;
