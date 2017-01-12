@@ -69,13 +69,18 @@ XTEST_SUITE(xhttp_server)
 		resp.done();
 	}
 
+	void hello (request &req, response &resp)
+	{
+		resp.set_data("hello");
+		resp.done();
+	}
 
 	XUNIT_TEST(regist)
 	{
-		xserver server;
+		xserver server(1);
 		server.bind("0.0.0.0", 9001);
 		//server.set_redis_addr("192.168.0.2",6379);
-		server.regist(async_test);
+		server.regist(hello);
 		server.regist_run_before([&] {
 			xhttp_server::init_async(server.get_proactor_pool().get_current_msgbox(), 1);
 		});

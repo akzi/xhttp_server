@@ -109,7 +109,7 @@ namespace xhttp_server
 		}
 		void handle_request(request &req)
 		{
-			xcoroutine::create([&] {
+			auto do_req = [&] {
 				req.in_callback_ = true;
 				request_handler_(req, req.resp_);
 				req.in_callback_ = false;
@@ -120,12 +120,13 @@ namespace xhttp_server
 					req.reset();
 					req.do_receive();
 				}
-				else if(req.send_buffers_.empty())
+				else if (req.send_buffers_.empty())
 				{
 					remove_request(req.id_);
 				}
 				//todo close connection
-			});
+			};
+			xcoroutine::create(std::move(do_req));
 		}
 		void add_request(int64_t id, std::shared_ptr<request> & req)
 		{
