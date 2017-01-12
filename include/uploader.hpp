@@ -34,12 +34,11 @@ namespace xhttp_server
 	private:
 		void init()
 		{
-			mime_parser_.regist_header_callback([&](const std::string &header_name, const std::string &header_value)
-			{
+			mime_parser_.regist_header_callback(
+				[&](const std::string &header_name,const std::string &header_value){
 				mime_header_callback(header_name, header_value);
 			});
-			mime_parser_.regist_data_callback([&](std::string &&data)
-			{
+			mime_parser_.regist_data_callback([&](std::string &&data){
 				data_callback(std::move(data));
 			});
 			mime_parser_.regist_end_callback([&] {
@@ -82,7 +81,8 @@ namespace xhttp_server
 			xcoroutine::yield(resume_handle);
 			return true;
 		}
-		void mime_header_callback(const std::string &name, const std::string &value)
+		void mime_header_callback(const std::string &name, 
+			const std::string &value)
 		{
 			close_file();
 			if (name == "Content-Disposition")
@@ -102,7 +102,8 @@ namespace xhttp_server
 				{
 					is_form_field_ = false;
 					filepath_pos += strlen("filename=\"");
-					std::string filepath = value.substr(filepath_pos, value.size() - filepath_pos - 1);
+					std::string filepath = 
+						value.substr(filepath_pos, value.size() - filepath_pos - 1);
 					if (filepath.empty())
 					{
 						filename_.clear();
@@ -118,7 +119,8 @@ namespace xhttp_server
 					else
 					{
 						filename_pos += 1;
-						filename_ = filepath.substr(filename_pos, filepath.size() - filename_pos);
+						filename_ = filepath.substr(filename_pos,
+							filepath.size() - filename_pos);
 					}
 					files_.emplace(std::move(header_name_), path_ + filename_);
 				}
@@ -134,7 +136,8 @@ namespace xhttp_server
 			{
 				if (!file_.is_open())
 				{
-					file_.open(path_ + filename_,std::ios::binary | std::ios::trunc);
+					file_.open(path_ + filename_, 
+						std::ios::binary | std::ios::trunc);
 					assert(file_.is_open());
 				}
 				file_.write(data.data(), data.size());

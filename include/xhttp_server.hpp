@@ -22,7 +22,13 @@ namespace xhttp_server
 		}
 		void start()
 		{
-			proactor_pool_.regist_run_before([this] {	before_run(); });
+			proactor_pool_.regist_run_before([this] {
+				for (auto &itr : before_runs_)
+					itr();
+			});
+			before_runs_.emplace_back([this] {
+				init_redis_session();
+			});
 			proactor_pool_.start();
 		}
 		void stop()
@@ -41,13 +47,23 @@ namespace xhttp_server
 			redis_cluster_ = cluster;
 			return *this;
 		}
+		xnet::proactor_pool &get_proactor_pool()
+		{
+			return proactor_pool_;
+		}
+		xserver &regist_run_before(const std::function<void()> &callback)
+		{
+			before_runs_.push_back(callback);
+			return *this;
+		}
 	private:
-		void before_run()
+		void init_redis_session()
 		{
 			if (redis_ip_.empty())
 				return;
-			auto &redis = detail::redis_creater::get_instance().get_redis(
-				proactor_pool_.get_current_proactor());
+			auto &creater = detail::redis_creater::get_instance();
+			auto &redis = creater.get_redis(&proactor_pool_.get_current_proactor());
+
 			redis.set_addr(redis_ip_, redis_port_, redis_cluster_);
 			if (redis_cluster_)
 			{
@@ -55,17 +71,18 @@ namespace xhttp_server
 					std::string &&error_code, bool status) {
 					if (status)
 					{
-						std::cout << "thread: " 
-							<< std::this_thread::get_id() 
-							<< " redis cluster init ok" 
+						std::cout << "thread: "
+							<< std::this_thread::get_id()
+							<< " redis cluster init ok"
 							<< std::endl;
 					}
 				});
 			}
-			else {
+			else
+			{
 				redis.regist_connect_success_callback([] {
-					std::cout << "thread: " 
-						<< std::this_thread::get_id() 
+					std::cout << "thread: "
+						<< std::this_thread::get_id()
 						<< " redis connect ok" << std::endl;
 				});
 				redis.regist_connect_failed_callback([](const std::string &error_code) {
@@ -79,6 +96,7 @@ namespace xhttp_server
 		{
 			auto req = std::make_shared<request>();
 			req->conn_ = std::move(conn);
+			req->xserver_ = this;
 			req->handle_request_ = std::bind(&xserver::handle_request, 
 				this, std::ref(*req));
 			auto id = gen_id();
@@ -86,7 +104,6 @@ namespace xhttp_server
 			req->close_callback_ = [&,id] {
 				remove_request(id);
 			};
-			req->proactor_ = &proactor_pool_.get_current_proactor();
 			add_request(req->id_, req);
 			req->do_receive();
 		}
@@ -132,5 +149,6 @@ namespace xhttp_server
 		std::string redis_ip_;
 		int redis_port_ = 6379;
 		bool redis_cluster_ = false;
+		std::vector<std::function<void()>> before_runs_;
 	};
 }

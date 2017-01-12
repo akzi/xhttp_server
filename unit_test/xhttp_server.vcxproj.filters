@@ -10,11 +10,17 @@
     <Filter Include="src">
       <UniqueIdentifier>{e8f61295-effa-4942-8c25-b04f53e8953b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\middleware">
+      <UniqueIdentifier>{89b952e8-1a65-4ec3-8b0d-f2f9475d431c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\middleware\redis_session">
+      <UniqueIdentifier>{68caa1f3-7553-4e75-a762-f8c8438c9de1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\middleware\async">
+      <UniqueIdentifier>{d0d0acb1-cde6-4130-988e-394d87e5e471}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\detail\redis_creater.hpp">
-      <Filter>include\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\detail\detail.hpp">
       <Filter>include\detail</Filter>
     </ClInclude>
@@ -27,9 +33,6 @@
     <ClInclude Include="..\include\xhttp_server.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\xsession.hpp">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\uploader.hpp">
       <Filter>include</Filter>
     </ClInclude>
@@ -38,6 +41,12 @@
     </ClInclude>
     <ClInclude Include="..\include\filelist.hpp">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\middleware\redis_session\xsession.hpp">
+      <Filter>include\middleware\redis_session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\middleware\async\async.hpp">
+      <Filter>include\middleware\async</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

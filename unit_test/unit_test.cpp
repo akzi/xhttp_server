@@ -21,7 +21,7 @@ XTEST_SUITE(xhttp_server)
 	void upload_file_test(request &req, response &rsp)
 	{
 		uploader _uploader(req);
-		_uploader.parser_request("");
+		_uploader.parse_request("");
 		std::cout << std::endl;
 		for(auto &itr: _uploader.get_field())
 			std::cout << itr.first << ": " << itr.second << std::endl;
@@ -56,12 +56,29 @@ XTEST_SUITE(xhttp_server)
 			resp.done();
 		}
 	}
+	std::string async_get_str(int value)
+	{
+		return std::to_string(value);
+	}
+
+	void async_test(request &req, response &resp)
+	{
+		auto value = async(async_get_str, 1);
+
+		resp.set_data(value);
+		resp.done();
+	}
+
+
 	XUNIT_TEST(regist)
 	{
 		xserver server;
 		server.bind("0.0.0.0", 9001);
 		//server.set_redis_addr("192.168.0.2",6379);
-		server.regist(filelist_test);
+		server.regist(async_test);
+		server.regist_run_before([&] {
+			xhttp_server::init_async(server.get_proactor_pool().get_current_msgbox(), 1);
+		});
 		server.start();
 		getchar();
 	}

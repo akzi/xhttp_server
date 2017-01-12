@@ -105,9 +105,7 @@ namespace xhttp_server
 			std::string session_id = parser_.get_header<strncasecmper>("XSEESSIONID");
 			if (session_id.empty())
 				session_id = gen_session_id();
-			assert(proactor_);
-			return xsession(detail::redis_creater::get_instance().
-				get_redis(*proactor_), session_id);
+			return{ detail::redis_creater::get_instance().get_redis(), session_id };
 		}
 		std::string get_header(const std::string &name)
 		{
@@ -116,6 +114,10 @@ namespace xhttp_server
 		std::string req_path()
 		{
 			return parser_.get_path();
+		}
+		class xserver &get_xserver()
+		{
+			return *xserver_;
 		}
 	private:
 		friend class xserver;
@@ -213,6 +215,6 @@ namespace xhttp_server
 		xhttper::http_parser parser_;
 		std::list<std::string> send_buffers_;
 		response resp_;
-		xnet::proactor *proactor_ = nullptr;
+		xserver *xserver_;
 	};
 }
