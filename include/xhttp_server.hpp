@@ -1,5 +1,5 @@
 #pragma once
-#include "detail\detail.hpp"
+#include "detail/detail.hpp"
 namespace xhttp_server
 {
 	class xserver

@@ -1,4 +1,5 @@
 #pragma once
+#include <fstream>
 namespace xhttp_server
 {
 	
@@ -45,7 +46,7 @@ namespace xhttp_server
 		{
 			using get_extension = xutil::functional::get_extension;
 
-			std::ifstream file(filepath, std::ifstream::binary);
+			std::ifstream file(filepath.c_str(), std::ios::binary);
 			if (!file)
 				return false;
 			std::string buffer((std::istreambuf_iterator<char>(file)),

@@ -77,7 +77,7 @@ XTEST_SUITE(xhttp_server)
 
 	XUNIT_TEST(regist)
 	{
-		xserver server(1);
+		xserver server;
 		server.bind("0.0.0.0", 9001);
 		//server.set_redis_addr("192.168.0.2",6379);
 		server.regist(hello);

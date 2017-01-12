@@ -1,4 +1,5 @@
 #pragma once
+#include <fstream>
 namespace xhttp_server
 {
 	class downloader
@@ -33,7 +34,7 @@ namespace xhttp_server
 			using get_extension = xutil::functional::get_extension;
 			using get_filename = xutil::functional::get_filename;
 
-			int mode = std::ios::binary | std::ios::in;
+			std::ios_base::openmode  mode = std::ios::binary | std::ios::in;
 			file_.open(filepath_.c_str(), mode);
 			if (!file_.good())
 				return false;
