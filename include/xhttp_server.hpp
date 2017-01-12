@@ -122,7 +122,7 @@ namespace xhttp_server
 				}
 				else if (req.send_buffers_.empty())
 				{
-					remove_request(req.id_);
+					//remove_request(req.id_);
 				}
 				//todo close connection
 			};

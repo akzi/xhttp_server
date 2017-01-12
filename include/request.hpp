@@ -192,8 +192,6 @@ namespace xhttp_server
 			if (send_buffers_.empty()) 
 			{
 				is_send_ = false;
-				if (!keepalive())
-					close();
 				return;
 			}
 			conn_.async_send(std::move(send_buffers_.front()));
