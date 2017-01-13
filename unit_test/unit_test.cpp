@@ -31,12 +31,12 @@ XTEST_SUITE(xhttp_server)
 		rsp.done();
 	}
 
-	void download_file_test(request &req, response &rsp)
+	void download_file_test(request &req, response &)
 	{
 		downloader download_file(req);
 		download_file.send_file("index.html");
 	}
-	void index(request &req, response &rsp)
+	void index(request &, response &rsp)
 	{
 		rsp.send_file("index.html");
 		rsp.done();
@@ -61,7 +61,7 @@ XTEST_SUITE(xhttp_server)
 		return std::to_string(value);
 	}
 
-	void async_test(request &req, response &resp)
+	void async_test(request &, response &resp)
 	{
 		auto value = async(async_get_str, 1);
 
@@ -69,7 +69,7 @@ XTEST_SUITE(xhttp_server)
 		resp.done();
 	}
 
-	void hello (request &req, response &resp)
+	void hello (request &, response &resp)
 	{
 		resp.set_status(200);
 		resp.add_entry("Date", "Fri, 28 Oct 2016 12:43:43 GMT");

@@ -42,7 +42,7 @@ namespace xhttp_server
 			resp_.done();
 		}
 
-		response &resp_;
 		std::string base_path_;
+		response &resp_;
 	};
 }

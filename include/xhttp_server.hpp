@@ -69,7 +69,11 @@ namespace xhttp_server
 			{
 				redis.regist_cluster_init_callback([](
 					std::string &&error_code, bool status) {
-					if (status)
+					if(error_code.size())
+					{
+						std::cout << error_code << std::endl;
+					}
+					else if (status)
 					{
 						std::cout << "thread: "
 							<< std::this_thread::get_id()

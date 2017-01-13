@@ -17,14 +17,6 @@ namespace xhttp_server
 			return true;
 		}
 	private:
-		bool send_http_header()
-		{
-			
-		}
-		int64_t get_file_size()
-		{
-			
-		}
 		void close()
 		{
 			request_.close();

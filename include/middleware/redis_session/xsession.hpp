@@ -42,13 +42,13 @@ namespace xhttp_server
 				res = true;
 			return res;
 		}
-		void del(const std::string &key)
+		void del(const std::string &)
 		{
 
 		}
 	private:
-		std::string session_id_;
 		xredis::redis &redis_;
+		std::string session_id_;
 	};
 
 	namespace detail
