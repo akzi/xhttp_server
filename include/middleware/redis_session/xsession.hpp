@@ -68,6 +68,49 @@ namespace xhttp_server
 			}
 
 		};
+
+
+		inline void init_redis_session(
+			xnet::proactor_pool &proactor_pool_, 
+			const std::string &redis_ip_, 
+			int redis_port_, 
+			bool redis_cluster_)
+		{
+			auto &creater = detail::redis_creater::get_instance();
+			auto &redis = creater.get_redis(&proactor_pool_.get_current_proactor());
+
+			redis.set_addr(redis_ip_, redis_port_, redis_cluster_);
+			if (redis_cluster_)
+			{
+				redis.regist_cluster_init_callback([](
+					std::string &&error_code, bool status) {
+					if (error_code.size())
+					{
+						std::cout << error_code << std::endl;
+					}
+					else if (status)
+					{
+						std::cout << "thread: "
+							<< std::this_thread::get_id()
+							<< " redis cluster init ok"
+							<< std::endl;
+					}
+				});
+			}
+			else
+			{
+				redis.regist_connect_success_callback([] {
+					std::cout << "thread: "
+						<< std::this_thread::get_id()
+						<< " redis connect ok" << std::endl;
+				});
+				redis.regist_connect_failed_callback([](const std::string &error_code) {
+					std::cout << "thread: "
+						<< std::this_thread::get_id()
+						<< " redis connect failed: " << error_code << std::endl;
+				});
+			}
+		}
 	}
 
 }

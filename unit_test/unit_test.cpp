@@ -14,8 +14,7 @@ XTEST_SUITE(xhttp_server)
 		std::string result;
 		xassert(session.get("hello",result));
 		xassert(result == "world");
-		rsp.set_data("hello world");
-		rsp.done();
+		rsp.done("hello world");
 	}
 
 	void upload_file_test(request &req, response &rsp)
@@ -27,8 +26,7 @@ XTEST_SUITE(xhttp_server)
 			std::cout << itr.first << ": " << itr.second << std::endl;
 		for (auto &itr : _uploader.get_files())
 			std::cout << itr.first << ": " << itr.second << std::endl;
-		rsp.set_data("ok");
-		rsp.done();
+		rsp.done("ok");
 	}
 
 	void download_file_test(request &req, response &)
@@ -64,18 +62,16 @@ XTEST_SUITE(xhttp_server)
 	void async_test(request &, response &resp)
 	{
 		auto value = async(async_get_str, 1);
-
-		resp.set_data(value);
-		resp.done();
+		resp.done(value);
 	}
 
 	void hello (request &, response &resp)
 	{
-		resp.set_status(200);
-		resp.add_entry("Date", "Fri, 28 Oct 2016 12:43:43 GMT");
-		resp.add_entry("Connection", "keep-alive");
-		resp.set_data("hello");
-		resp.done();
+		resp.
+			set_status(200).
+			set_date().
+			add_entry("Connection", "keep-alive").
+			done("hello world");
 	}
 
 	XUNIT_TEST(regist)

@@ -25,6 +25,7 @@ namespace xhttp_server
 		{
 			using get_extension = xutil::functional::get_extension;
 			using get_filename = xutil::functional::get_filename;
+			using get_rfc1123 = xutil::functional::get_rfc1123;
 
 			std::ios_base::openmode  mode = std::ios::binary | std::ios::in;
 			file_.open(filepath_.c_str(), mode);
@@ -32,6 +33,7 @@ namespace xhttp_server
 				return false;
 			file_.seekg(0, std::ios::end);
 			auto size = file_.tellg();
+			http_builder_.append_entry("Date", get_rfc1123()());
 			http_builder_.append_entry("Content-Type", http_builder_.get_content_type(get_extension()(filepath_)));
 			http_builder_.append_entry("Content-Length", std::to_string(size).c_str());
 			http_builder_.append_entry("Content-Disposition", "attachment; filename=" + get_filename()(filepath_));
