@@ -56,7 +56,8 @@ namespace xhttp_server
 				std::istreambuf_iterator<char>());
 			data_ = std::move(buffer);
 			file.close();
-			builder_.append_entry("Content-Type", builder_.get_content_type(get_extension()(filepath)));
+			builder_.append_entry("Content-Type", 
+				builder_.get_content_type(get_extension()(filepath)));
 			return true;
 		}
 		response &set_date(const std::string &date = xutil::functional::get_rfc1123()())

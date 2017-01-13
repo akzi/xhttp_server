@@ -28,6 +28,7 @@ namespace xhttp_server
 					buffer.append("<li><a href=" + _path + itr + ">" + _path + itr + "</a></li>\r\n");
 			}
 			buffer.append("</ul>\r\n</body>\r\n</html>\r\n");
+			resp_.set_content_type("text/html");
 			resp_.set_status(200);
 			resp_.done(std::move(buffer));
 		}
