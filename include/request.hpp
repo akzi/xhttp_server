@@ -119,6 +119,30 @@ namespace xhttp_server
 		{
 			return *xserver_;
 		}
+		std::pair<uint64_t, uint64_t> get_range()
+		{
+			static std::pair<uint64_t, uint64_t>  noexist = { UINT64_MAX, UINT64_MAX };
+
+			std::string range = parser_.get_header<strncasecmper>("Range");
+			if (range.empty())
+				return noexist;
+			auto pos = range.find("=");
+			if(pos == range.npos)
+				return noexist;
+			++pos;
+			auto end = pos;
+			auto begin = std::stoull(range.c_str() + pos, &end, 10);
+			if (end == pos)
+				begin = UINT64_MAX;
+			pos = range.find('-');
+			if (pos == range.npos)
+				return noexist;
+			++pos;
+			if (pos == range.size())
+				return {begin, UINT64_MAX };
+
+			return{ begin, std::stoull(range.c_str() + pos, 0, 10) };
+		}
 	private:
 		friend class xserver;
 		friend class uploader;
