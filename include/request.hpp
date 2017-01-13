@@ -172,6 +172,7 @@ namespace xhttp_server
 					close();
 					return;
 				}
+				is_send_ = false;
 				try_send();
 			});
 			conn_.regist_recv_callback([this](char *data, std::size_t len)
@@ -187,13 +188,12 @@ namespace xhttp_server
 		}
 		void try_send()
 		{
-			if (is_send_ || is_close_)
+			if (is_send_ ||
+			    is_close_ ||
+			    send_buffers_.empty()) 
 				return;
-			if (send_buffers_.empty()) 
-			{
-				is_send_ = false;
-				return;
-			}
+
+			is_send_ = true;
 			conn_.async_send(std::move(send_buffers_.front()));
 			send_buffers_.pop_front();
 		}

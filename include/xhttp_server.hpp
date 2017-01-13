@@ -118,12 +118,12 @@ namespace xhttp_server
 				else if (req.keepalive())
 				{
 					req.reset();
-					req.do_receive();
 				}
 				else if (req.send_buffers_.empty())
 				{
 					//remove_request(req.id_);
 				}
+				req.do_receive();
 				//todo close connection
 			};
 			xcoroutine::create(std::move(do_req));

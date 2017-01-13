@@ -63,6 +63,7 @@ namespace xhttp_server
 			std::string buffer = builder_.build_resp();
 			buffer.append(data_);
 			send_buffer_(std::move(buffer));
+			reset();
 		}
 	private:
 		friend class request;

@@ -71,6 +71,9 @@ XTEST_SUITE(xhttp_server)
 
 	void hello (request &req, response &resp)
 	{
+		resp.set_status(200);
+		resp.add_entry("Date", "Fri, 28 Oct 2016 12:43:43 GMT");
+		resp.add_entry("Connection", "keep-alive");
 		resp.set_data("hello");
 		resp.done();
 	}
