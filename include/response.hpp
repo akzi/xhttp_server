@@ -42,6 +42,11 @@ namespace xhttp_server
 			builder_.append_entry(keyname, value);
 			return *this;
 		}
+		response &set_content_type(const std::string &content_type)
+		{
+			content_type_ = content_type;
+			return *this;
+		}
 		bool send_file(const std::string &filepath)
 		{
 			using get_extension = xutil::functional::get_extension;
@@ -65,14 +70,16 @@ namespace xhttp_server
 		void done(T &&data = {})
 		{
 			data_ = std::forward<T>(data);
-
 			if (date_.empty())
 				date_ = xutil::functional::get_rfc1123()();
 			builder_.append_entry("Date",std::move(date_));
 
-			if(data_.size())
+			if (data_.size())
+			{
+				builder_.append_entry("Content-type", content_type_);
 				builder_.append_entry("Content-Length", std::to_string(data_.size()));
-			
+			}
+
 			if (!keep_alive_)
 				builder_.append_entry("Connection", "close");
 			else
@@ -95,5 +102,6 @@ namespace xhttp_server
 		std::function<void(std::string &&)> send_buffer_;
 		std::string data_;
 		xhttper::http_builder builder_;
+		std::string content_type_ { "plain/text" };
 	};
 }
