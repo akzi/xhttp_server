@@ -67,11 +67,7 @@ XTEST_SUITE(xhttp_server)
 
 	void hello (request &, response &resp)
 	{
-		resp.
-			set_status(200).
-			set_date().
-			add_entry("Connection", "keep-alive").
-			done("hello world");
+		resp.done("hello world");
 	}
 
 	XUNIT_TEST(regist)

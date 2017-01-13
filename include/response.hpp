@@ -26,10 +26,8 @@ namespace xhttp_server
 		response &set_status(int status)
 		{
 			builder_.set_status(status);
-			if (status == 404)
-			{
-				data_ = "<html><body><h1>404</1h></body></html>";
-			}
+			if (status == 404 && data_.empty())
+				data_ = "404";
 			return *this;
 		}
 		response &set_keep_alive(bool value)
@@ -70,6 +68,7 @@ namespace xhttp_server
 		void done(T &&data = {})
 		{
 			data_ = std::forward<T>(data);
+
 			if (date_.empty())
 				date_ = xutil::functional::get_rfc1123()();
 			builder_.append_entry("Date",std::move(date_));
@@ -102,6 +101,6 @@ namespace xhttp_server
 		std::function<void(std::string &&)> send_buffer_;
 		std::string data_;
 		xhttper::http_builder builder_;
-		std::string content_type_ { "plain/text" };
+		std::string content_type_ { "text/plain" };
 	};
 }
