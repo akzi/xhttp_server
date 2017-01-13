@@ -32,8 +32,8 @@ namespace xhttp_server
 				return false;
 			file_.seekg(0, std::ios::end);
 			auto size = file_.tellg();
-			http_builder_.append_entry("Content-Length", std::to_string(size).c_str());
 			http_builder_.append_entry("Content-Type", http_builder_.get_content_type(get_extension()(filepath_)));
+			http_builder_.append_entry("Content-Length", std::to_string(size).c_str());
 			http_builder_.append_entry("Content-Disposition", "attachment; filename=" + get_filename()(filepath_));
 			std::string buffer;
 			buffer.resize(102400);

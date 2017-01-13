@@ -128,6 +128,7 @@ namespace xhttp_server
 			body_.clear();
 			boundary_.clear();
 			is_close_ = false;
+			in_callback_ = false;
 			content_length_ = (std::size_t)-1;
 			keepalive_ = -1;
 			method_ = NUll;

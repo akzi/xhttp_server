@@ -98,16 +98,13 @@ namespace xhttp_server
 		}
 		void accept_callback(xnet::connection &&conn)
 		{
+			auto id = gen_id();
 			auto req = std::make_shared<request>();
+			req->id_ = id;
 			req->conn_ = std::move(conn);
 			req->xserver_ = this;
-			req->handle_request_ = std::bind(&xserver::handle_request, 
-				this, std::ref(*req));
-			auto id = gen_id();
-			req->id_ = id;
-			req->close_callback_ = [&,id] {
-				remove_request(id);
-			};
+			req->handle_request_ = std::bind(&xserver::handle_request, this, std::ref(*req));
+			req->close_callback_ = [&,id] { remove_request(id); };
 			add_request(req->id_, req);
 			req->do_receive();
 		}
@@ -116,19 +113,13 @@ namespace xhttp_server
 			auto do_req = [&] {
 				req.in_callback_ = true;
 				request_handler_(req, req.resp_);
-				req.in_callback_ = false;
 				if (req.is_close_)
+				{
 					remove_request(req.id_);
-				else if (req.keepalive())
-				{
-					req.reset();
+					return;
 				}
-				else if (req.send_buffers_.empty())
-				{
-					//remove_request(req.id_);
-				}
+				req.reset();
 				req.do_receive();
-				//todo close connection
 			};
 			xcoroutine::create(std::move(do_req));
 		}
