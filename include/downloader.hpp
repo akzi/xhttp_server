@@ -26,8 +26,6 @@ namespace xhttp_server
 		}
 		bool check_cache()
 		{
-			using get_extension = xutil::functional::get_extension;
-			using get_filename = xutil::functional::get_filename;
 			using get_rfc1123 = xutil::functional::get_rfc1123;
 			using last_modified = xutil::vfs::last_modified;
 			using strcasecmper = xutil::functional::strcasecmper;
@@ -51,7 +49,6 @@ namespace xhttp_server
 			}
 			if (if_none_match.size())
 			{
-				auto range = request_.get_range();
 				auto ssbuf = std::ostringstream();
 				auto etag = last_modified()(filepath_) +
 					xutil::vfs::file_size()(filepath_);
