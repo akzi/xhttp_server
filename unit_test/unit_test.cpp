@@ -75,7 +75,7 @@ XTEST_SUITE(xhttp_server)
 		xserver server;
 		server.bind("0.0.0.0", 9001);
 		//server.set_redis_addr("192.168.0.2",6379);
-		server.regist(filelist_test);
+		server.regist(hello);
 		server.regist_run_before([&] {
 			xhttp_server::init_async(server.get_proactor_pool().get_current_msgbox(), 1);
 		});
