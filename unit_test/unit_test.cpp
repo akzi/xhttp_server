@@ -34,10 +34,23 @@ XTEST_SUITE(xhttp_server)
 		downloader download_file(req);
 		download_file.send_file("index.html");
 	}
-	void index(request &, response &rsp)
+	void index(request &req, response &resp)
 	{
-		rsp.send_file("index.html");
-		rsp.done();
+		if (req.req_path() == "/")
+		{
+			resp.send_file("index.html");
+			resp.done();
+		}
+		else
+		{
+			downloader download_file(req);
+			if (!download_file.send_file(xutil::vfs::getcwd()() + req.req_path()))
+			{
+				resp.set_status(404);
+				resp.done();
+			}
+		}
+		
 	}
 	void filelist_test(request &req, response &resp)
 	{
@@ -75,7 +88,7 @@ XTEST_SUITE(xhttp_server)
 		xserver server;
 		server.bind("0.0.0.0", 9001);
 		//server.set_redis_addr("192.168.0.2",6379);
-		server.regist(hello);
+		server.regist(index);
 		server.regist_run_before([&] {
 			xhttp_server::init_async(server.get_proactor_pool().get_current_msgbox(), 1);
 		});

@@ -54,10 +54,9 @@ namespace xhttp_server
 				return false;
 			std::string buffer((std::istreambuf_iterator<char>(file)),
 				std::istreambuf_iterator<char>());
-			data_ = std::move(buffer);
 			file.close();
-			builder_.append_entry("Content-Type", 
-				builder_.get_content_type(get_extension()(filepath)));
+			data_ = std::move(buffer);
+			content_type_ = builder_.get_content_type(get_extension()(filepath));
 			return true;
 		}
 		response &set_date(const std::string &date = xutil::functional::get_rfc1123()())
@@ -68,7 +67,8 @@ namespace xhttp_server
 		template<typename T = std::string>
 		void done(T &&data = {})
 		{
-			data_ = std::forward<T>(data);
+			if(get_size(data))
+				data_ = std::forward<T>(data);
 
 			if (date_.empty())
 				date_ = xutil::functional::get_rfc1123()();
@@ -91,6 +91,17 @@ namespace xhttp_server
 			reset();
 		}
 	private:
+		std::size_t get_size(const std::string &str)
+		{
+			return str.size();
+		}
+
+		std::size_t get_size(const char *str)
+		{
+			if (!str)
+				return 0;
+			return strlen(str);
+		}
 		friend class request;
 		void reset()
 		{
