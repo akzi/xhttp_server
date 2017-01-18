@@ -48,6 +48,9 @@
     <ClInclude Include="..\include\middleware\async\async.hpp">
       <Filter>include\middleware\async</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\query.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="unit_test.cpp">
