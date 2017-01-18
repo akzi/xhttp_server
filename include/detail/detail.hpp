@@ -19,6 +19,7 @@
 
 #include "../middleware/redis_session/xsession.hpp"
 #include "../middleware/async/async.hpp"
+#include "../query.hpp"
 #include "../response.hpp"
 #include "../request.hpp"
 #include "../uploader.hpp"

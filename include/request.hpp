@@ -111,9 +111,13 @@ namespace xhttp_server
 		{
 			return parser_.get_header<strncasecmper>(name.c_str());
 		}
-		std::string req_path()
+		std::string url()
 		{
-			return parser_.get_path();
+			return parser_.url();
+		}
+		std::string path()
+		{
+			return path_;
 		}
 		class xserver &get_xserver()
 		{
@@ -143,6 +147,10 @@ namespace xhttp_server
 
 			return{ begin, std::stoull(range.c_str() + pos, 0, 10) };
 		}
+		query &get_query()
+		{
+			return query_;
+		}
 	private:
 		friend class xserver;
 		friend class uploader;
@@ -171,6 +179,13 @@ namespace xhttp_server
 			parser_.append(data, len);
 			if (parser_.parse_req())
 			{
+				auto url = parser_.url();
+				auto pos = url.find('?');
+				if (pos != url.npos)
+				{
+					++pos;
+					query_ = query(url.c_str() + pos);
+				}
 				handle_request_();
 				return;
 			}
@@ -222,6 +237,8 @@ namespace xhttp_server
 			conn_.async_send(std::move(send_buffers_.front()));
 			send_buffers_.pop_front();
 		}
+		std::string path_;
+		query query_;
 		std::string boundary_;
 		bool is_close_ = false;
 		bool is_send_ = false;
