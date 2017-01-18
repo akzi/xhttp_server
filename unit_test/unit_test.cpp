@@ -3,6 +3,20 @@
 
 xtest_run;
 
+XTEST_SUITE(query)
+{
+	XUNIT_TEST(query_test)
+	{
+		xhttp_server::query q("EIO=3&transport=polling&t=Lcm23ng&b64=5&sid=0.283746&uid=2938747464");
+
+		xassert(q.get<int>("EIO") == 3);
+		xassert(q.get("transport") == "polling");
+		xassert(q.get("t") == "Lcm23ng");
+		xassert(q.get<double>("sid") == double(0.283746));
+		xassert(q.get<int64_t>("uid") == 2938747464L);
+	}
+}
+
 XTEST_SUITE(xhttp_server)
 {
 	using namespace xhttp_server;
@@ -41,7 +55,7 @@ XTEST_SUITE(xhttp_server)
 	}
 	void filelist_test(request &req, response &resp)
 	{
-		auto path = req.req_path();
+		auto path = req.url();
 		if (path.back() == '/' || path.back() == '\\')
 		{
 			filelist fl(resp);
@@ -79,7 +93,7 @@ XTEST_SUITE(xhttp_server)
 		xserver server;
 		server.bind("0.0.0.0", 9001);
 		//server.set_redis_addr("192.168.0.2",6379);
-		server.regist(hello);
+		server.regist(filelist_test);
 		server.regist_run_before([&] {
 			xhttp_server::init_async(server.get_proactor_pool().get_current_msgbox(), 1);
 		});
