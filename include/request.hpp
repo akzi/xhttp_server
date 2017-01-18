@@ -147,7 +147,7 @@ namespace xhttp_server
 
 			return{ begin, std::stoull(range.c_str() + pos, 0, 10) };
 		}
-		query &get_query()
+		xhttper::query &get_query()
 		{
 			return query_;
 		}
@@ -174,6 +174,12 @@ namespace xhttp_server
 				time_since_epoch().
 				count());
 		}
+		bool check_upgrade()
+		{
+			using cmper = xutil::functional::strncasecmper;
+			auto upgrade = parser_.get_header<cmper>("Upgrade");
+			return cmper()(upgrade.c_str(), "websocket", strlen("websocket"));
+		}
 		void recv_callback(char *data, std::size_t len)
 		{
 			parser_.append(data, len);
@@ -184,10 +190,24 @@ namespace xhttp_server
 				if (pos != url.npos)
 				{
 					++pos;
-					query_ = query(url.c_str() + pos);
+					query_ = xhttper::query(url.c_str() + pos);
 				}
-				handle_request_();
-				return;
+				if (check_upgrade())
+				{
+					if (!handle_upgrade_)
+					{
+						resp_.set_status(404);
+						resp_.done("Not Support Upgrade");
+						close();
+						return;
+					}
+					handle_upgrade_();
+				}
+				else
+				{
+					handle_request_();
+					return;
+				}
 			}
 			conn_.async_recv_some();
 		}
@@ -238,7 +258,7 @@ namespace xhttp_server
 			send_buffers_.pop_front();
 		}
 		std::string path_;
-		query query_;
+		xhttper::query query_;
 		std::string boundary_;
 		bool is_close_ = false;
 		bool is_send_ = false;
@@ -246,6 +266,7 @@ namespace xhttp_server
 		bool in_callback_ = false;
 		std::function<void()> close_callback_;
 		std::function<void()> handle_request_;
+		std::function<void()> handle_upgrade_;
 		std::function<void(std::string &&)> body_callback_;
 		std::string body_;
 		xnet::connection conn_;

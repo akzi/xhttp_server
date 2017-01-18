@@ -8,6 +8,7 @@
 #include "../../../xhttper/include/http_builder.hpp"
 #include "../../../xhttper/include/http_parser.hpp"
 #include "../../../xhttper/include/mime_parser.hpp"
+#include "../../../xhttper/include/query.hpp"
 #include "../../../xutil/include/functional.hpp"
 #include "../../../xutil/include/function_traits.hpp"
 #include "../../../xutil/include/vfs.hpp"
@@ -17,7 +18,6 @@
 
 #include "../middleware/redis_session/xsession.hpp"
 #include "../middleware/async/async.hpp"
-#include "../query.hpp"
 #include "../response.hpp"
 #include "../request.hpp"
 #include "../uploader.hpp"

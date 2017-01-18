@@ -7,7 +7,7 @@ XTEST_SUITE(query)
 {
 	XUNIT_TEST(query_test)
 	{
-		xhttp_server::query q("EIO=3&transport=polling&t=Lcm23ng&b64=5&sid=0.283746&uid=2938747464");
+		xhttper::query q("EIO=3&transport=polling&t=Lcm23ng&b64=5&sid=0.283746&uid=2938747464");
 
 		xassert(q.get<int>("EIO") == 3);
 		xassert(q.get("transport") == "polling");

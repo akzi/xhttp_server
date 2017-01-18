@@ -6,6 +6,7 @@ namespace xhttp_server
 	{
 	public:
 		using request_handler = std::function<void(request &req, response &rsp)>;
+		using on_message = std::function<void(request &req, response &rsp)>;
 
 		xserver(std::size_t thread_count = std::thread::hardware_concurrency())
 			:proactor_pool_(thread_count)
